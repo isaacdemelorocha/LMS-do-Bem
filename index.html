@@ -341,7 +341,7 @@
       display: inline-block;
     }
 
-    /* Grade de Cursos (Estilo Grid de Produtos Apple Store) */
+    /* Grade de Cursos */
     .shelf-header {
       display: flex;
       justify-content: space-between;
@@ -366,7 +366,7 @@
       gap: 1.75rem;
     }
 
-    /* Course Card — Apple Clean Aesthetics */
+    /* Course Card */
     .course-card {
       background: var(--apple-card-bg);
       border-radius: var(--apple-radius-lg);
@@ -616,6 +616,12 @@
     /* --- CONFIGURAÇÃO DA PLANILHA GOOGLE --- */
     const SPREADSHEET_ID = '1WNwX9DUBtKFD9XCjltm4JEj54EpKULwNQxQiaJ8qO4s';
     const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Cursos`;
+
+    /* 
+      Cole abaixo a URL gerada ao publicar sua Implantação Web (App da Web) 
+      do Google Apps Script que contém o doPost(e):
+    */
+    const URL_WEBHOOK_TELEMETRIA = 'https://script.google.com/macros/s/AKfycbyc3G9fN_exemplo_substitua_aqui/exec';
 
     /* --- CAPTURA DE PARÂMETROS UTM E REFERRER NO CLIENTE --- */
     const params = new URLSearchParams(window.location.search);
@@ -937,7 +943,7 @@
       });
     }
 
-    /* --- TELEMETRIA E REDIRECIONAMENTO --- */
+    /* --- TELEMETRIA ATIVA E REDIRECIONAMENTO --- */
     function acessarCurso(cursoId, btn) {
       const curso = todosOsCursos.find(c => String(c.id) === String(cursoId));
       if (!curso || !curso.url) {
@@ -949,6 +955,7 @@
       btn.disabled = true;
       btn.innerHTML = `<span>Iniciando...</span>`;
 
+      // Estrutura com as 12 colunas exatas da aba LogsAcesso
       const metadados = {
         data_hora: new Date().toISOString(),
         id_visitante: obterOuCriarAnonId(),
@@ -966,7 +973,24 @@
 
       console.log('Telemetria capturada:', metadados);
 
-      // Abre a URL cadastrada na coluna E da planilha
+      // Envia os metadados diretamente para a aba LogsAcesso via Webhook
+      if (URL_WEBHOOK_TELEMETRIA && !URL_WEBHOOK_TELEMETRIA.includes('exemplo_substitua_aqui')) {
+        try {
+          fetch(URL_WEBHOOK_TELEMETRIA, {
+            method: 'POST',
+            mode: 'no-cors', // Essencial para requisições cross-origin do Apps Script
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(metadados),
+            keepalive: true // Garante o envio contínuo mesmo com abertura de nova aba
+          });
+        } catch (erroEnvio) {
+          console.warn('Erro ao disparar telemetria:', erroEnvio);
+        }
+      } else {
+        console.warn('URL_WEBHOOK_TELEMETRIA não configurada. A telemetria foi salva apenas localmente no console.');
+      }
+
+      // Abre a URL do treinamento em nova aba
       window.open(curso.url, '_blank');
 
       btn.disabled = false;
