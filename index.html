@@ -950,24 +950,24 @@
       btn.innerHTML = `<span>A iniciar...</span>`;
 
       // 1. O ID do formulário que foi criado via Apps Script
-      const ID_DO_FORMULARIO = 'COLE_O_ID_DO_SEU_FORMULARIO_AQUI';
+      const ID_DO_FORMULARIO = '16O1WOVw_b3jEK4QV5TSCq0daqtW5Um7yVUzhWEXGTXU';
       const URL_FORMULARIO = `https://docs.google.com/forms/d/e/${ID_DO_FORMULARIO}/formResponse`;
 
       const dadosFormulario = new URLSearchParams();
       
       // ATENÇÃO: Substitua os números "111111" pelos IDs reais (entry.XXXXXX) do seu formulário
-      dadosFormulario.append('entry.111111', new Date().toISOString()); 
-      dadosFormulario.append('entry.222222', obterOuCriarAnonId());
-      dadosFormulario.append('entry.333333', curso.id);
-      dadosFormulario.append('entry.444444', curso.pilar);
-      dadosFormulario.append('entry.555555', curso.titulo);
-      dadosFormulario.append('entry.666666', /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop');
-      dadosFormulario.append('entry.777777', detectarAmbiente());
-      dadosFormulario.append('entry.888888', Math.round((Date.now() - tempoInicio) / 1000));
-      dadosFormulario.append('entry.999999', utmSource);
-      dadosFormulario.append('entry.000000', utmCampaign);
-      dadosFormulario.append('entry.121212', obterReferrer());
-      dadosFormulario.append('entry.343434', Intl.DateTimeFormat().resolvedOptions().timeZone || 'Indefinido');
+      dadosFormulario.append('entry.1200752559', new Date().toISOString()); 
+      dadosFormulario.append('entry.918407970', obterOuCriarAnonId());
+      dadosFormulario.append('entry.314243428', curso.id);
+      dadosFormulario.append('entry.1341320408', curso.pilar);
+      dadosFormulario.append('entry.123281836', curso.titulo);
+      dadosFormulario.append('entry.1078165289', /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop');
+      dadosFormulario.append('entry.1326168992', detectarAmbiente());
+      dadosFormulario.append('entry.1994814519', Math.round((Date.now() - tempoInicio) / 1000));
+      dadosFormulario.append('entry.653796382', utmSource);
+      dadosFormulario.append('entry.456414631', utmCampaign);
+      dadosFormulario.append('entry.631372814', obterReferrer());
+      dadosFormulario.append('entry.1684268466', Intl.DateTimeFormat().resolvedOptions().timeZone || 'Indefinido');
 
       console.log('A enviar telemetria para o formulário...');
 
