@@ -951,7 +951,7 @@
 
       // 1. O ID do formulário que foi criado via Apps Script
       const ID_DO_FORMULARIO = '16O1WOVw_b3jEK4QV5TSCq0daqtW5Um7yVUzhWEXGTXU';
-      const URL_FORMULARIO = `https://docs.google.com/forms/d/e/${16O1WOVw_b3jEK4QV5TSCq0daqtW5Um7yVUzhWEXGTXU}/formResponse`;
+      const URL_FORMULARIO = `https://docs.google.com/forms/d/e/1FAIpQLSexEdPqOgG3qK8rVE-mppMjRah-DJrDgjCW4oLWG7HjkkyRHg/viewform`;
 
       const dadosFormulario = new URLSearchParams();
       
@@ -972,7 +972,7 @@
       console.log('A enviar telemetria para o formulário...');
 
       // 2. Disparo silencioso
-      if (ID_DO_FORMULARIO !== 'COLE_O_ID_DO_SEU_FORMULARIO_AQUI') {
+      if (ID_DO_FORMULARIO !== '16O1WOVw_b3jEK4QV5TSCq0daqtW5Um7yVUzhWEXGTXU') {
         fetch(URL_FORMULARIO, {
           method: 'POST',
           mode: 'no-cors',
