@@ -607,22 +607,15 @@
   </main>
 
   <footer class="site-footer">
-    <p>Copyright &copy; LMS do Bem. Telemetria anônima registrada para melhoria contínua da experiência educacional.</p>
+    <p>Copyright &copy; LMS do Bem. Telemetria anônima registada para melhoria contínua da experiência educacional.</p>
   </footer>
 
   <script>
     const tempoInicio = Date.now();
 
-    /* --- CONFIGURAÇÃO DA PLANILHA GOOGLE --- */
+    /* --- CONFIGURAÇÃO DA FOLHA DE CÁLCULO GOOGLE --- */
     const SPREADSHEET_ID = '1WNwX9DUBtKFD9XCjltm4JEj54EpKULwNQxQiaJ8qO4s';
     const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Cursos`;
-
-    /* 
-      ========================================================================
-      👇 COLE A URL DO SEU GOOGLE APPS SCRIPT AQUI DENTRO DAS ASPAS 👇
-      ========================================================================
-    */
-    const URL_WEBHOOK_TELEMETRIA = 'COLE_A_URL_DO_WEBHOOK_AQUI';
 
     /* --- CAPTURA DE PARÂMETROS UTM E REFERRER NO CLIENTE --- */
     const params = new URLSearchParams(window.location.search);
@@ -703,7 +696,7 @@
       try {
         const resposta = await fetch(GVIZ_URL);
         if (!resposta.ok) {
-          throw new Error('Falha na requisição. Verifique se o compartilhamento da planilha está definido para "Qualquer pessoa com o link".');
+          throw new Error('Falha na requisição. Verifique se o compartilhamento da folha de cálculo está definido para "Qualquer pessoa com o link".');
         }
 
         const texto = await resposta.text();
@@ -711,7 +704,7 @@
         const fimJson = texto.lastIndexOf('}');
         
         if (inicioJson === -1 || fimJson === -1) {
-          throw new Error('Formato retornado pela planilha é inválido.');
+          throw new Error('Formato devolvido pela folha de cálculo é inválido.');
         }
 
         const payload = JSON.parse(texto.substring(inicioJson, fimJson + 1));
@@ -734,7 +727,7 @@
       } catch (err) {
         document.getElementById('loading').innerHTML = `
           <div style="background:#fff; border-radius:18px; padding:2rem; max-width:600px; margin:0 auto; box-shadow:var(--apple-shadow-card); border:1px solid rgba(199,36,73,0.2);">
-            <p style="color: #c72449; font-weight:700; margin-bottom:0.5rem; font-size:1.05rem;">Não foi possível carregar a planilha</p>
+            <p style="color: #c72449; font-weight:700; margin-bottom:0.5rem; font-size:1.05rem;">Não foi possível carregar a folha de cálculo</p>
             <p style="color: var(--apple-text-secondary); font-size:0.92rem; line-height:1.5;">${err.message}</p>
           </div>
         `;
@@ -908,7 +901,7 @@
         grid.innerHTML = `
           <div class="empty-state">
             <h3 style="font-size:1.15rem; font-weight:700; margin-bottom:0.4rem; color:var(--apple-text-primary);">Nenhum curso encontrado</h3>
-            <p style="font-size:0.92rem;">Não encontramos opções com o termo "${termo}". Redefina a busca ou selecione outro pilar.</p>
+            <p style="font-size:0.92rem;">Não encontrámos opções com o termo "${termo}". Redefina a busca ou selecione outro pilar.</p>
           </div>
         `;
         return;
@@ -944,54 +937,58 @@
       });
     }
 
-    /* --- TELEMETRIA ATIVA E REDIRECIONAMENTO --- */
+    /* --- TELEMETRIA ATIVA E REDIRECIONAMENTO (VIA GOOGLE FORMS) --- */
     function acessarCurso(cursoId, btn) {
       const curso = todosOsCursos.find(c => String(c.id) === String(cursoId));
       if (!curso || !curso.url) {
-        alert('Curso não localizado ou sem URL cadastrada na planilha.');
+        alert('Curso não localizado ou sem URL registada na folha de cálculo.');
         return;
       }
 
       const textoOriginal = btn.innerHTML;
       btn.disabled = true;
-      btn.innerHTML = `<span>Iniciando...</span>`;
+      btn.innerHTML = `<span>A iniciar...</span>`;
 
-      // Estrutura com as 12 colunas exatas da aba LogsAcesso
-      const metadados = {
-        data_hora: new Date().toISOString(),
-        id_visitante: obterOuCriarAnonId(),
-        curso_id: curso.id,
-        pilar: curso.pilar,
-        titulo_curso: curso.titulo,
-        dispositivo: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
-        navegador_so: detectarAmbiente(),
-        tempo_ate_clique_seg: Math.round((Date.now() - tempoInicio) / 1000),
-        utm_source: utmSource,
-        utm_campaign: utmCampaign,
-        referrer: obterReferrer(),
-        fuso_horario: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Indefinido'
-      };
+      // 1. O ID do formulário que foi criado via Apps Script
+      const ID_DO_FORMULARIO = 'COLE_O_ID_DO_SEU_FORMULARIO_AQUI';
+      const URL_FORMULARIO = `https://docs.google.com/forms/d/e/${ID_DO_FORMULARIO}/formResponse`;
 
-      console.log('Telemetria capturada:', metadados);
+      const dadosFormulario = new URLSearchParams();
+      
+      // ATENÇÃO: Substitua os números "111111" pelos IDs reais (entry.XXXXXX) do seu formulário
+      dadosFormulario.append('entry.111111', new Date().toISOString()); 
+      dadosFormulario.append('entry.222222', obterOuCriarAnonId());
+      dadosFormulario.append('entry.333333', curso.id);
+      dadosFormulario.append('entry.444444', curso.pilar);
+      dadosFormulario.append('entry.555555', curso.titulo);
+      dadosFormulario.append('entry.666666', /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop');
+      dadosFormulario.append('entry.777777', detectarAmbiente());
+      dadosFormulario.append('entry.888888', Math.round((Date.now() - tempoInicio) / 1000));
+      dadosFormulario.append('entry.999999', utmSource);
+      dadosFormulario.append('entry.000000', utmCampaign);
+      dadosFormulario.append('entry.121212', obterReferrer());
+      dadosFormulario.append('entry.343434', Intl.DateTimeFormat().resolvedOptions().timeZone || 'Indefinido');
 
-      // Envia os metadados diretamente para a aba LogsAcesso via Webhook
-      if (URL_WEBHOOK_TELEMETRIA && URL_WEBHOOK_TELEMETRIA !== 'https://script.google.com/macros/s/AKfycbzJxScoxjxRR93SkQeb7E6I2wdQ0qrycuCLsqFm8AxIwaTL8Q-RkU4BsiTsqNRvrxk8FA/exec') {
-        try {
-          fetch(URL_WEBHOOK_TELEMETRIA, {
-            method: 'POST',
-            mode: 'no-cors', // Essencial para requisições cross-origin do Apps Script
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(metadados),
-            keepalive: true // Garante o envio contínuo mesmo com abertura de nova aba
-          });
-        } catch (erroEnvio) {
+      console.log('A enviar telemetria para o formulário...');
+
+      // 2. Disparo silencioso
+      if (ID_DO_FORMULARIO !== 'COLE_O_ID_DO_SEU_FORMULARIO_AQUI') {
+        fetch(URL_FORMULARIO, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: dadosFormulario,
+          keepalive: true
+        }).catch(erroEnvio => {
           console.warn('Erro ao disparar telemetria:', erroEnvio);
-        }
+        });
       } else {
-        console.warn('URL_WEBHOOK_TELEMETRIA não configurada. A telemetria foi salva apenas localmente no console.');
+        console.warn('O ID do formulário não foi configurado. Os dados não foram enviados.');
       }
 
-      // Abre a URL do treinamento em nova aba
+      // 3. Abre a URL do treinamento em nova aba
       window.open(curso.url, '_blank');
 
       btn.disabled = false;
