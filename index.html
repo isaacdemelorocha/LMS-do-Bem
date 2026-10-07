@@ -581,7 +581,7 @@
           id="search-input" 
           class="search-input" 
           placeholder="Buscar por nome do curso ou conteúdo da descrição..."
-          oninput="executarFiltroGeral()"
+          oninput="debouncePesquisa()"
         />
         <button id="clear-search-btn" class="clear-search-btn" onclick="limparBusca()" title="Limpar pesquisa">&times;</button>
       </div>
@@ -613,7 +613,77 @@
   <script>
     const tempoInicio = Date.now();
 
-    /* --- CONFIGURAÇÃO DA FOLHA DE CÁLCULO GOOGLE --- */
+    /* =======================================================
+       1. COLETA DE NOVAS MÉTRICAS (SCROLL, CLICKMAP E BUSCA)
+       ======================================================= */
+    
+    // Variáveis Globais de Coleta
+    let maxScrollPercentual = 0;
+    let termosPesquisados = [];
+    let mapaCliques = [];
+    let timeoutPesquisa = null;
+
+    // A. Percentual de Scroll Depth
+    window.addEventListener('scroll', () => {
+      const scrollPosition = window.scrollY + window.innerHeight;
+      const totalHeight = document.documentElement.scrollHeight;
+      const percentualAtual = Math.round((scrollPosition / totalHeight) * 100);
+      
+      if (percentualAtual > maxScrollPercentual) {
+        maxScrollPercentual = percentualAtual;
+      }
+    });
+
+    // B. Mapa de Calor (Heatmap de Cliques)
+    document.addEventListener('click', (e) => {
+      // Guarda os últimos 20 cliques para não sobrecarregar o Formulário
+      if (mapaCliques.length < 20) {
+        const elementoClicado = e.target.tagName.toLowerCase();
+        const posicao = `[X:${e.pageX},Y:${e.pageY}]`;
+        mapaCliques.push(`${elementoClicado}${posicao}`);
+      }
+    });
+
+    // C. Coleta de Termos Digitados (Debounce para não registrar cada letra)
+    function debouncePesquisa() {
+      executarFiltroGeral(); // Continua filtrando a tela imediatamente
+      
+      clearTimeout(timeoutPesquisa);
+      timeoutPesquisa = setTimeout(() => {
+        const termo = document.getElementById('search-input').value.trim();
+        if (termo.length > 2 && !termosPesquisados.includes(termo)) {
+          termosPesquisados.push(termo);
+        }
+      }, 2000); // Salva a palavra se o usuário parar de digitar por 2 segundos
+    }
+
+    /* =======================================================
+       2. ENVIO DE TELEMETRIA AO SAIR DA PÁGINA (PAGEHIDE)
+       ======================================================= */
+    window.addEventListener('pagehide', enviarTelemetriaNavegacao);
+
+    function enviarTelemetriaNavegacao() {
+      // ⚠️ SUBSTITUA PELOS DADOS DO SEU NOVO GOOGLE FORMS DE NAVEGAÇÃO ⚠️
+      const URL_FORM_NAVEGACAO = 'https://docs.google.com/forms/d/e/1FAIpQLSe7ojXwBZxc_P97mKpKUtFmuxGXPWhoPgJ09RQX31sblHMq0g/viewform';
+      
+      if (URL_FORM_NAVEGACAO.includes('1FAIpQLSe7ojXwBZxc_P97mKpKUtFmuxGXPWhoPgJ09RQX31sblHMq0g')) return; // Evita erro se não for preenchido
+
+      const dadosNavegacao = new URLSearchParams();
+      
+      // Mapeie os entrys do novo formulário (estes IDs são exemplos)
+      dadosNavegacao.append('entry.542734769', obterOuCriarAnonId()); // ID Usuário
+      dadosNavegacao.append('entry.586608640', Math.round((Date.now() - tempoInicio) / 1000)); // Tempo (s)
+      dadosNavegacao.append('entry.1837004314', maxScrollPercentual + '%'); // Scroll Máximo
+      dadosNavegacao.append('entry.868989117', termosPesquisados.join(' | ') || 'Nenhuma busca'); // Termos
+      dadosNavegacao.append('entry.1264240892', mapaCliques.join('; ') || 'Sem cliques'); // Mapa de Calor
+      dadosNavegacao.append('entry.1403675174', detectarAmbiente()); // Dispositivo
+
+      // sendBeacon é nativo do navegador para disparar pacotes sem atrasar o fechamento da aba
+      navigator.sendBeacon(URL_FORM_NAVEGACAO, dadosNavegacao);
+    }
+
+
+    /* --- CONFIGURAÇÃO DA FOLHA DE CÁLCULO GOOGLE (CURSOS) --- */
     const SPREADSHEET_ID = '1WNwX9DUBtKFD9XCjltm4JEj54EpKULwNQxQiaJ8qO4s';
     const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Cursos`;
 
@@ -937,7 +1007,7 @@
       });
     }
 
-    /* --- TELEMETRIA ATIVA E REDIRECIONAMENTO (VIA GOOGLE FORMS) --- */
+    /* --- TELEMETRIA ATIVA E REDIRECIONAMENTO (VIA GOOGLE FORMS PRINCIPAL) --- */
     function acessarCurso(cursoId, btn) {
       const curso = todosOsCursos.find(c => String(c.id) === String(cursoId));
       if (!curso || !curso.url) {
@@ -949,7 +1019,7 @@
       btn.disabled = true;
       btn.innerHTML = `<span>A iniciar...</span>`;
 
-      // URL corrigida terminando em /formResponse
+      // Este é o Formulário 1 (o que você já tinha configurado para Conversão em Curso)
       const URL_FORMULARIO = `https://docs.google.com/forms/d/e/1FAIpQLSexEdPqOgG3qK8rVE-mppMjRah-DJrDgjCW4oLWG7HjkkyRHg/formResponse`;
 
       const dadosFormulario = new URLSearchParams();
@@ -967,9 +1037,8 @@
       dadosFormulario.append('entry.631372814', obterReferrer());
       dadosFormulario.append('entry.1684268466', Intl.DateTimeFormat().resolvedOptions().timeZone || 'Indefinido');
 
-      console.log('A enviar telemetria para o formulário...');
+      console.log('A enviar telemetria de conversão para o formulário principal...');
 
-      // Envio silencioso corrigido (sem a condicional que bloqueava o POST)
       fetch(URL_FORMULARIO, {
         method: 'POST',
         mode: 'no-cors',
