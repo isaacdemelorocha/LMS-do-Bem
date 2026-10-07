@@ -949,13 +949,11 @@
       btn.disabled = true;
       btn.innerHTML = `<span>A iniciar...</span>`;
 
-      // 1. O ID do formulário que foi criado via Apps Script
-      const ID_DO_FORMULARIO = '16O1WOVw_b3jEK4QV5TSCq0daqtW5Um7yVUzhWEXGTXU';
-      const URL_FORMULARIO = `https://docs.google.com/forms/d/e/1FAIpQLSexEdPqOgG3qK8rVE-mppMjRah-DJrDgjCW4oLWG7HjkkyRHg/viewform`;
+      // URL corrigida terminando em /formResponse
+      const URL_FORMULARIO = `https://docs.google.com/forms/d/e/1FAIpQLSexEdPqOgG3qK8rVE-mppMjRah-DJrDgjCW4oLWG7HjkkyRHg/formResponse`;
 
       const dadosFormulario = new URLSearchParams();
       
-      // ATENÇÃO: Substitua os números "111111" pelos IDs reais (entry.XXXXXX) do seu formulário
       dadosFormulario.append('entry.1200752559', new Date().toISOString()); 
       dadosFormulario.append('entry.918407970', obterOuCriarAnonId());
       dadosFormulario.append('entry.314243428', curso.id);
@@ -971,26 +969,23 @@
 
       console.log('A enviar telemetria para o formulário...');
 
-      // 2. Disparo silencioso
-      if (ID_DO_FORMULARIO !== '16O1WOVw_b3jEK4QV5TSCq0daqtW5Um7yVUzhWEXGTXU') {
-        fetch(URL_FORMULARIO, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: dadosFormulario,
-          keepalive: true
-        }).catch(erroEnvio => {
-          console.warn('Erro ao disparar telemetria:', erroEnvio);
-        });
-      } else {
-        console.warn('O ID do formulário não foi configurado. Os dados não foram enviados.');
-      }
+      // Envio silencioso corrigido (sem a condicional que bloqueava o POST)
+      fetch(URL_FORMULARIO, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: dadosFormulario,
+        keepalive: true
+      }).catch(erroEnvio => {
+        console.warn('Erro ao disparar telemetria:', erroEnvio);
+      });
 
-      // 3. Abre a URL do treinamento em nova aba
+      // Abre a URL do treinamento em nova aba
       window.open(curso.url, '_blank');
 
+      // Restaura o botão
       btn.disabled = false;
       btn.innerHTML = textoOriginal;
     }
