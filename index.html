@@ -1,35 +1,977 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aplicação</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LMS do Bem</title>
+
+  <!-- Tipografia SF Pro / Inter para estética nativa Apple -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root {
+      /* Apple Design System Tokens */
+      --apple-bg: #f5f5f7;
+      --apple-card-bg: #ffffff;
+      --apple-header-bg: rgba(255, 255, 255, 0.82);
+      --apple-text-primary: #1d1d1f;
+      --apple-text-secondary: #6e6e73;
+      --apple-text-tertiary: #86868b;
+      --apple-link: #0071e3;
+      --apple-link-hover: #0077ed;
+      --apple-border: rgba(0, 0, 0, 0.08);
+      --apple-border-light: rgba(0, 0, 0, 0.05);
+      --apple-radius-sm: 12px;
+      --apple-radius-md: 18px;
+      --apple-radius-lg: 24px;
+      --apple-radius-xl: 30px;
+      --apple-radius-pill: 9999px;
+      --apple-shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.04);
+      --apple-shadow-card: 0 8px 30px rgba(0, 0, 0, 0.05);
+      --apple-shadow-card-hover: 0 16px 40px rgba(0, 0, 0, 0.09);
+      --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Helvetica Neue", Arial, sans-serif;
     }
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden; /* Remove as barras de rolagem da página externa */
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: var(--font-system);
+      color: var(--apple-text-primary);
+      background-color: var(--apple-bg);
+      line-height: 1.47059;
+      letter-spacing: -0.022em;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
-    iframe {
+
+    /* Apple Minimalist Header */
+    .site-header {
+      background: var(--apple-header-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--apple-border);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .header-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0.85rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--apple-text-primary);
+      letter-spacing: -0.03em;
+    }
+    .brand-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--apple-text-primary);
+      color: #fff;
+      border-radius: 8px;
+    }
+    .header-badge {
+      font-size: 0.78rem;
+      color: var(--apple-text-secondary);
+      background: rgba(0, 0, 0, 0.04);
+      padding: 0.35rem 0.85rem;
+      border-radius: var(--apple-radius-pill);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    /* Hero / Apple Store Title Section */
+    .hero-section {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 3.5rem 2rem 2rem;
+    }
+    .hero-eyebrow {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--apple-text-tertiary);
+      margin-bottom: 0.4rem;
+    }
+    .hero-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .hero-title {
+      font-size: clamp(2.2rem, 4.2vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      line-height: 1.1;
+      color: var(--apple-text-primary);
+    }
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--apple-text-secondary);
+      max-width: 500px;
+      font-weight: 400;
+      line-height: 1.4;
+    }
+
+    /* Carrossel de Destaques Apple Shelf */
+    .shelf-section {
+      margin-bottom: 3.5rem;
+    }
+    .carousel-container {
+      position: relative;
+      border-radius: var(--apple-radius-xl);
+      overflow: hidden;
+      background: #000000;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    }
+    .carousel-track {
+      display: flex;
+      transition: transform 0.55s cubic-bezier(0.25, 1, 0.5, 1);
       width: 100%;
-      height: 100%;
+    }
+    .carousel-slide {
+      min-width: 100%;
+      padding: 3.5rem 3.5rem 3.2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: #ffffff;
+      background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.12), transparent 45%), linear-gradient(135deg, #161617 0%, #000000 100%);
+      min-height: 320px;
+      position: relative;
+    }
+    .carousel-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #f56300;
+      margin-bottom: 0.75rem;
+    }
+    .carousel-title {
+      font-size: clamp(1.6rem, 2.8vw, 2.3rem);
+      font-weight: 700;
+      line-height: 1.18;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.8rem;
+      max-width: 760px;
+    }
+    .carousel-desc {
+      font-size: 1.05rem;
+      color: #a1a1a6;
+      max-width: 680px;
+      margin-bottom: 2rem;
+      line-height: 1.45;
+    }
+    .carousel-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.15);
       border: none;
-      display: block;
+      color: #ffffff;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      transition: background 0.2s, transform 0.2s;
+      z-index: 10;
+    }
+    .carousel-nav-btn:hover {
+      background: rgba(255, 255, 255, 0.28);
+      transform: translateY(-50%) scale(1.05);
+    }
+    .carousel-prev { left: 16px; }
+    .carousel-next { right: 16px; }
+
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 1.2rem;
+    }
+    .carousel-dot {
+      width: 8px;
+      height: 8px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: var(--apple-radius-pill);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .carousel-dot.active {
+      width: 24px;
+      background: var(--apple-text-primary);
+    }
+
+    /* Container Principal */
+    .main-container {
+      max-width: 1280px;
+      margin: 0 auto 5rem;
+      padding: 0 2rem;
+    }
+
+    /* Barra de Busca Minimalista */
+    .search-filter-section {
+      margin-bottom: 2.2rem;
+    }
+    .search-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      max-width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .search-icon {
+      position: absolute;
+      left: 1.25rem;
+      color: var(--apple-text-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      padding: 1.05rem 3.2rem 1.05rem 3.4rem;
+      font-size: 1.02rem;
+      font-family: inherit;
+      color: var(--apple-text-primary);
+      background: var(--apple-card-bg);
+      border: 1px solid var(--apple-border);
+      border-radius: var(--apple-radius-pill);
+      outline: none;
+      transition: all 0.25s ease;
+      box-shadow: var(--apple-shadow-subtle);
+      letter-spacing: -0.015em;
+    }
+    .search-input:focus {
+      border-color: var(--apple-link);
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+    }
+    .search-input::placeholder {
+      color: var(--apple-text-tertiary);
+    }
+    .clear-search-btn {
+      position: absolute;
+      right: 1.25rem;
+      background: rgba(0, 0, 0, 0.06);
+      border: none;
+      color: var(--apple-text-secondary);
+      cursor: pointer;
+      display: none;
+      font-size: 1.1rem;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      line-height: 1;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    .clear-search-btn:hover {
+      background: rgba(0, 0, 0, 0.12);
+      color: var(--apple-text-primary);
+    }
+
+    /* Filtros Pill Buttons Apple Style */
+    .filters-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .filter-btn {
+      background: var(--apple-card-bg);
+      border: 1px solid var(--apple-border);
+      color: var(--apple-text-secondary);
+      padding: 0.55rem 1.15rem;
+      border-radius: var(--apple-radius-pill);
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .filter-btn:hover {
+      color: var(--apple-text-primary);
+      border-color: rgba(0, 0, 0, 0.18);
+      transform: translateY(-1px);
+    }
+    .filter-btn.active {
+      background: var(--apple-text-primary);
+      color: #ffffff;
+      border-color: var(--apple-text-primary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+    .filter-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* Grade de Cursos (Estilo Grid de Produtos Apple Store) */
+    .shelf-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1.5rem;
+    }
+    .shelf-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--apple-text-primary);
+    }
+    .catalog-counter {
+      font-size: 0.9rem;
+      color: var(--apple-text-secondary);
+      font-weight: 500;
+    }
+
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 1.75rem;
+    }
+
+    /* Course Card — Apple Clean Aesthetics */
+    .course-card {
+      background: var(--apple-card-bg);
+      border-radius: var(--apple-radius-lg);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease;
+      box-shadow: var(--apple-shadow-card);
+      border: 1px solid var(--apple-border-light);
+      position: relative;
+      overflow: hidden;
+    }
+    .course-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--apple-shadow-card-hover);
+    }
+
+    .card-pilar-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.73rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.35rem 0.75rem;
+      border-radius: var(--apple-radius-pill);
+      margin-bottom: 1.1rem;
+      width: fit-content;
+      transition: opacity 0.2s;
+    }
+
+    .card-icon-bubble {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--apple-radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.2rem;
+      transition: transform 0.25s ease;
+    }
+    .course-card:hover .card-icon-bubble {
+      transform: scale(1.06);
+    }
+
+    .card-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--apple-text-primary);
+      line-height: 1.25;
+      letter-spacing: -0.025em;
+      margin-bottom: 0.65rem;
+    }
+    .card-desc {
+      font-size: 0.95rem;
+      color: var(--apple-text-secondary);
+      line-height: 1.48;
+      margin-bottom: 2rem;
+      flex-grow: 1;
+    }
+
+    /* Apple Pill Buttons */
+    .btn-apple {
+      background-color: var(--apple-link);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--apple-radius-pill);
+      padding: 0.75rem 1.4rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      transition: background-color 0.2s, transform 0.15s;
+      font-family: inherit;
+      text-decoration: none;
+    }
+    .btn-apple:hover {
+      background-color: var(--apple-link-hover);
+    }
+    .btn-apple:active {
+      transform: scale(0.98);
+    }
+    .btn-apple:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .btn-apple-carousel {
+      width: fit-content;
+      background-color: #ffffff;
+      color: #000000;
+      padding: 0.85rem 1.8rem;
+      font-size: 0.92rem;
+    }
+    .btn-apple-carousel:hover {
+      background-color: #f2f2f2;
+    }
+
+    /* Estado Vazio */
+    .empty-state {
+      text-align: center;
+      padding: 5rem 1.5rem;
+      color: var(--apple-text-secondary);
+      grid-column: 1 / -1;
+      background: var(--apple-card-bg);
+      border-radius: var(--apple-radius-lg);
+      border: 1px dashed var(--apple-border);
+    }
+
+    /* Spinner Apple Minimalist */
+    .loading-state {
+      text-align: center;
+      padding: 4.5rem 1rem;
+      color: var(--apple-text-secondary);
+    }
+    .apple-spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(0, 0, 0, 0.08);
+      border-top-color: var(--apple-text-primary);
+      border-radius: 50%;
+      animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      margin: 0 auto 1.2rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Footer Apple */
+    .site-footer {
+      border-top: 1px solid var(--apple-border);
+      background: #f5f5f7;
+      color: var(--apple-text-tertiary);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+    .site-footer p {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+      .hero-section { padding: 2.5rem 1.25rem 1.5rem; }
+      .main-container { padding: 0 1.25rem; }
+      .carousel-slide { padding: 2.5rem 1.8rem; }
+      .carousel-prev { left: 8px; }
+      .carousel-next { right: 8px; }
+      .courses-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <iframe 
-    src="https://script.google.com/macros/s/AKfycbyywjjoj60FvPKiWCXGRgYxFsVry7W8hvbvCbL10noYsvjWqDMiv102bN9x5RrOPg0ohQ/exec" 
-    allow="clipboard-read; clipboard-write; geolocation; microphone; camera"
-    allowfullscreen>
-  </iframe>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="#" class="brand-logo">
+        <span class="brand-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </span>
+        <span>LMS do Bem</span>
+      </a>
+      <div class="header-badge">
+        Portal de Capacitação Social
+      </div>
+    </div>
+  </header>
 
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-eyebrow">Catálogo Geral</div>
+    <div class="hero-title-row">
+      <h1 class="hero-title">Trilhas de Aprendizagem</h1>
+      <p class="hero-subtitle">
+        Explore os conteúdos em destaque ou filtre por pilares temáticos para desenvolver novas habilidades.
+      </p>
+    </div>
+
+    <!-- Carrossel de Destaques (Estilo Shelf Apple) -->
+    <div id="carousel-wrapper" class="shelf-section" style="display: none;">
+      <div class="carousel-container">
+        <button class="carousel-nav-btn carousel-prev" onclick="moverCarrossel(-1)" aria-label="Anterior">&#10094;</button>
+        <div id="carousel-track" class="carousel-track"></div>
+        <button class="carousel-nav-btn carousel-next" onclick="moverCarrossel(1)" aria-label="Próximo">&#10095;</button>
+      </div>
+      <div id="carousel-dots" class="carousel-dots"></div>
+    </div>
+  </section>
+
+  <!-- Conteúdo Principal -->
+  <main class="main-container">
+    <div class="search-filter-section">
+      <!-- Barra de Busca -->
+      <div class="search-input-wrapper">
+        <span class="search-icon">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </span>
+        <input 
+          type="text" 
+          id="search-input" 
+          class="search-input" 
+          placeholder="Buscar por nome do curso ou conteúdo da descrição..."
+          oninput="executarFiltroGeral()"
+        />
+        <button id="clear-search-btn" class="clear-search-btn" onclick="limparBusca()" title="Limpar pesquisa">&times;</button>
+      </div>
+
+      <!-- Filtros por Pilar -->
+      <div id="filters-container" class="filters-wrapper" style="display: none;"></div>
+    </div>
+
+    <!-- Cabeçalho da Grade -->
+    <div class="shelf-header">
+      <h2 class="shelf-title">Todos os Cursos</h2>
+      <span id="catalog-counter" class="catalog-counter">0 cursos disponíveis</span>
+    </div>
+
+    <!-- Spinner -->
+    <div id="loading" class="loading-state">
+      <div class="apple-spinner"></div>
+      <p>Carregando catálogo de treinamentos...</p>
+    </div>
+
+    <!-- Grade de Cursos Regulares -->
+    <div id="courses-grid" class="courses-grid" style="display: none;"></div>
+  </main>
+
+  <footer class="site-footer">
+    <p>Copyright &copy; LMS do Bem. Telemetria anônima registrada para melhoria contínua da experiência educacional.</p>
+  </footer>
+
+  <script>
+    const tempoInicio = Date.now();
+
+    /* --- CONFIGURAÇÃO DA PLANILHA GOOGLE --- */
+    const SPREADSHEET_ID = '1WNwX9DUBtKFD9XCjltm4JEj54EpKULwNQxQiaJ8qO4s';
+    const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Cursos`;
+
+    /* --- CAPTURA DE PARÂMETROS UTM E REFERRER NO CLIENTE --- */
+    const params = new URLSearchParams(window.location.search);
+    const utmSource = params.get('utm_source') || 'Direto / Não Informado';
+    const utmCampaign = params.get('utm_campaign') || 'Nenhuma';
+    const refParam = params.get('ref') || params.get('referrer') || '';
+
+    function obterReferrer() {
+      let ref = document.referrer;
+      if (!ref && refParam) ref = refParam;
+      return ref ? ref : 'Acesso Direto / Desconhecido';
+    }
+
+    /* --- SISTEMA DE CORES DINÂMICO PARA CADA PILAR --- */
+    const PALETA_APPLE = [
+      { text: '#0071e3', bg: '#e8f2fc', iconBg: 'rgba(0, 113, 227, 0.12)' }, // Apple Blue
+      { text: '#bf4800', bg: '#faeee6', iconBg: 'rgba(191, 72, 0, 0.12)' },   // Amber / Orange
+      { text: '#1b7a42', bg: '#e8f5ed', iconBg: 'rgba(27, 122, 66, 0.12)' },  // Forest Green
+      { text: '#8935c1', bg: '#f4e9fc', iconBg: 'rgba(137, 53, 193, 0.12)' }, // Purple
+      { text: '#c72449', bg: '#fdecf0', iconBg: 'rgba(199, 36, 73, 0.12)' },  // Rose
+      { text: '#027a8e', bg: '#e5f6f8', iconBg: 'rgba(2, 122, 142, 0.12)' },  // Teal
+      { text: '#b36b00', bg: '#fef7e6', iconBg: 'rgba(179, 107, 0, 0.12)' },  // Gold / Ochre
+      { text: '#435368', bg: '#edf1f5', iconBg: 'rgba(67, 83, 104, 0.12)' }   // Slate
+    ];
+
+    const mapaCoresPilares = {};
+
+    function obterEstiloPilar(pilar) {
+      const chave = (pilar || 'Geral').trim().toLowerCase();
+      if (!mapaCoresPilares[chave]) {
+        let hash = 0;
+        for (let i = 0; i < chave.length; i++) {
+          hash = chave.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const indice = Math.abs(hash) % PALETA_APPLE.length;
+        mapaCoresPilares[chave] = PALETA_APPLE[indice];
+      }
+      return mapaCoresPilares[chave];
+    }
+
+    function obterOuCriarAnonId() {
+      let id = localStorage.getItem('lms_anon_id');
+      if (!id) {
+        id = 'anon_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+        localStorage.setItem('lms_anon_id', id);
+      }
+      return id;
+    }
+
+    function detectarAmbiente() {
+      const ua = navigator.userAgent;
+      let so = "Desconhecido", nav = "Desconhecido";
+      if (/Windows/i.test(ua)) so = "Windows";
+      else if (/Macintosh|Mac OS/i.test(ua)) so = "macOS";
+      else if (/Android/i.test(ua)) so = "Android";
+      else if (/iPhone|iPad/i.test(ua)) so = "iOS";
+      else if (/Linux/i.test(ua)) so = "Linux";
+
+      if (/Edg/i.test(ua)) nav = "Edge";
+      else if (/Chrome/i.test(ua)) nav = "Chrome";
+      else if (/Safari/i.test(ua)) nav = "Safari";
+      else if (/Firefox/i.test(ua)) nav = "Firefox";
+
+      return `${so} / ${nav}`;
+    }
+
+    let todosOsCursos = [];
+    let cursosRegulares = [];
+    let cursosDestaque = [];
+    let pilarSelecionado = 'Todos';
+    let carrosselIndice = 0;
+    let carrosselInterval = null;
+
+    /* --- CARREGAMENTO DIRETO DO GOOGLE SHEETS --- */
+    window.addEventListener('DOMContentLoaded', carregarCursosDaPlanilha);
+
+    async function carregarCursosDaPlanilha() {
+      try {
+        const resposta = await fetch(GVIZ_URL);
+        if (!resposta.ok) {
+          throw new Error('Falha na requisição. Verifique se o compartilhamento da planilha está definido para "Qualquer pessoa com o link".');
+        }
+
+        const texto = await resposta.text();
+        const inicioJson = texto.indexOf('{');
+        const fimJson = texto.lastIndexOf('}');
+        
+        if (inicioJson === -1 || fimJson === -1) {
+          throw new Error('Formato retornado pela planilha é inválido.');
+        }
+
+        const payload = JSON.parse(texto.substring(inicioJson, fimJson + 1));
+        const rows = payload.table && payload.table.rows ? payload.table.rows : [];
+
+        todosOsCursos = rows
+          .map(row => {
+            const cols = row.c || [];
+            return {
+              id: cols[0]?.v != null ? String(cols[0].v).trim() : '',
+              pilar: cols[1]?.v != null ? String(cols[1].v).trim() : 'Geral',
+              titulo: cols[2]?.v != null ? String(cols[2].v).trim() : '',
+              descricao: cols[3]?.v != null ? String(cols[3].v).trim() : '',
+              url: cols[4]?.v != null ? String(cols[4].v).trim() : ''
+            };
+          })
+          .filter(c => c.id && c.titulo);
+
+        processarDados(todosOsCursos);
+      } catch (err) {
+        document.getElementById('loading').innerHTML = `
+          <div style="background:#fff; border-radius:18px; padding:2rem; max-width:600px; margin:0 auto; box-shadow:var(--apple-shadow-card); border:1px solid rgba(199,36,73,0.2);">
+            <p style="color: #c72449; font-weight:700; margin-bottom:0.5rem; font-size:1.05rem;">Não foi possível carregar a planilha</p>
+            <p style="color: var(--apple-text-secondary); font-size:0.92rem; line-height:1.5;">${err.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    function processarDados(cursos) {
+      document.getElementById('loading').style.display = 'none';
+
+      cursosDestaque = (cursos || []).filter(c => (c.pilar || '').toLowerCase() === 'destaque');
+      cursosRegulares = (cursos || []).filter(c => (c.pilar || '').toLowerCase() !== 'destaque');
+
+      if (cursosDestaque.length > 0) {
+        montarCarrossel(cursosDestaque);
+      }
+
+      if (cursosRegulares.length === 0) {
+        const grid = document.getElementById('courses-grid');
+        grid.style.display = 'block';
+        grid.innerHTML = '<p style="text-align:center; color:#86868b; padding: 3rem;">Nenhum curso regular cadastrado na aba "Cursos".</p>';
+        return;
+      }
+
+      criarFiltrosRegulares();
+      executarFiltroGeral();
+    }
+
+    /* --- CARROSSEL APPLE --- */
+    function montarCarrossel(destaques) {
+      const track = document.getElementById('carousel-track');
+      const dotsContainer = document.getElementById('carousel-dots');
+      const wrapper = document.getElementById('carousel-wrapper');
+
+      track.innerHTML = '';
+      dotsContainer.innerHTML = '';
+
+      destaques.forEach((c, idx) => {
+        const slide = document.createElement('div');
+        slide.className = 'carousel-slide';
+        slide.innerHTML = `
+          <div>
+            <div class="carousel-eyebrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+              Trilha em Destaque
+            </div>
+            <h3 class="carousel-title">${c.titulo}</h3>
+            <p class="carousel-desc">${c.descricao}</p>
+          </div>
+          <button class="btn-apple btn-apple-carousel" onclick="acessarCurso('${c.id}', this)">
+            <span>Explorar Trilha</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        `;
+        track.appendChild(slide);
+
+        const dot = document.createElement('div');
+        dot.className = `carousel-dot ${idx === 0 ? 'active' : ''}`;
+        dot.onclick = () => irParaSlide(idx);
+        dotsContainer.appendChild(dot);
+      });
+
+      wrapper.style.display = 'block';
+      iniciarAutoPlay();
+    }
+
+    function atualizarCarrossel() {
+      const track = document.getElementById('carousel-track');
+      track.style.transform = `translateX(-${carrosselIndice * 100}%)`;
+
+      const dots = document.querySelectorAll('.carousel-dot');
+      dots.forEach((dot, idx) => {
+        dot.className = `carousel-dot ${idx === carrosselIndice ? 'active' : ''}`;
+      });
+    }
+
+    function moverCarrossel(passo) {
+      carrosselIndice = (carrosselIndice + passo + cursosDestaque.length) % cursosDestaque.length;
+      atualizarCarrossel();
+      reiniciarAutoPlay();
+    }
+
+    function irParaSlide(indice) {
+      carrosselIndice = indice;
+      atualizarCarrossel();
+      reiniciarAutoPlay();
+    }
+
+    function iniciarAutoPlay() {
+      if (cursosDestaque.length > 1) {
+        carrosselInterval = setInterval(() => moverCarrossel(1), 6000);
+      }
+    }
+
+    function reiniciarAutoPlay() {
+      clearInterval(carrosselInterval);
+      iniciarAutoPlay();
+    }
+
+    /* --- FILTROS DE PILARES COM PONTOS DE COR --- */
+    function criarFiltrosRegulares() {
+      const container = document.getElementById('filters-container');
+      const pilares = ['Todos', ...new Set(cursosRegulares.map(c => c.pilar))];
+
+      container.innerHTML = '';
+      pilares.forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = `filter-btn ${p === 'Todos' ? 'active' : ''}`;
+
+        if (p !== 'Todos') {
+          const estilo = obterEstiloPilar(p);
+          btn.innerHTML = `<span class="filter-dot" style="background-color: ${estilo.text}"></span><span>${p}</span>`;
+        } else {
+          btn.innerHTML = `<span>Todos</span>`;
+        }
+
+        btn.onclick = () => {
+          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          pilarSelecionado = p;
+          executarFiltroGeral();
+        };
+        container.appendChild(btn);
+      });
+
+      container.style.display = 'flex';
+    }
+
+    /* --- FILTRAGEM COMBINADA --- */
+    function executarFiltroGeral() {
+      const termo = document.getElementById('search-input').value.trim().toLowerCase();
+      const clearBtn = document.getElementById('clear-search-btn');
+      clearBtn.style.display = termo.length > 0 ? 'inline-flex' : 'none';
+
+      let resultado = pilarSelecionado === 'Todos'
+        ? cursosRegulares
+        : cursosRegulares.filter(c => c.pilar === pilarSelecionado);
+
+      if (termo) {
+        resultado = resultado.filter(c => {
+          const tituloMatch = (c.titulo || '').toLowerCase().includes(termo);
+          const descMatch = (c.descricao || '').toLowerCase().includes(termo);
+          return tituloMatch || descMatch;
+        });
+      }
+
+      const counter = document.getElementById('catalog-counter');
+      counter.innerText = `${resultado.length} ${resultado.length === 1 ? 'curso disponível' : 'cursos disponíveis'}`;
+
+      renderizarGrade(resultado, termo);
+    }
+
+    function limparBusca() {
+      const input = document.getElementById('search-input');
+      input.value = '';
+      input.focus();
+      executarFiltroGeral();
+    }
+
+    /* --- RENDERIZAÇÃO DOS CARDS COM COR PERSONALIZADA POR PILAR --- */
+    function renderizarGrade(cursos, termo = '') {
+      const grid = document.getElementById('courses-grid');
+      grid.style.display = 'grid';
+      grid.innerHTML = '';
+
+      if (cursos.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <h3 style="font-size:1.15rem; font-weight:700; margin-bottom:0.4rem; color:var(--apple-text-primary);">Nenhum curso encontrado</h3>
+            <p style="font-size:0.92rem;">Não encontramos opções com o termo "${termo}". Redefina a busca ou selecione outro pilar.</p>
+          </div>
+        `;
+        return;
+      }
+
+      cursos.forEach(c => {
+        const estilo = obterEstiloPilar(c.pilar);
+        const card = document.createElement('div');
+        card.className = 'course-card';
+        card.innerHTML = `
+          <div>
+            <div class="card-icon-bubble" style="background-color: ${estilo.iconBg}; color: ${estilo.text};">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+              </svg>
+            </div>
+            <span class="card-pilar-tag" style="background-color: ${estilo.bg}; color: ${estilo.text};">
+              ${c.pilar}
+            </span>
+            <h3 class="card-title">${c.titulo}</h3>
+            <p class="card-desc">${c.descricao}</p>
+          </div>
+          <button class="btn-apple" onclick="acessarCurso('${c.id}', this)">
+            <span>Iniciar Treinamento</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    /* --- TELEMETRIA E REDIRECIONAMENTO --- */
+    function acessarCurso(cursoId, btn) {
+      const curso = todosOsCursos.find(c => String(c.id) === String(cursoId));
+      if (!curso || !curso.url) {
+        alert('Curso não localizado ou sem URL cadastrada na planilha.');
+        return;
+      }
+
+      const textoOriginal = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<span>Iniciando...</span>`;
+
+      const metadados = {
+        data_hora: new Date().toISOString(),
+        id_visitante: obterOuCriarAnonId(),
+        curso_id: curso.id,
+        pilar: curso.pilar,
+        titulo_curso: curso.titulo,
+        dispositivo: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
+        navegador_so: detectarAmbiente(),
+        tempo_ate_clique_seg: Math.round((Date.now() - tempoInicio) / 1000),
+        utm_source: utmSource,
+        utm_campaign: utmCampaign,
+        referrer: obterReferrer(),
+        fuso_horario: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Indefinido'
+      };
+
+      console.log('Telemetria capturada:', metadados);
+
+      // Abre a URL cadastrada na coluna E da planilha
+      window.open(curso.url, '_blank');
+
+      btn.disabled = false;
+      btn.innerHTML = textoOriginal;
+    }
+  </script>
 </body>
 </html>
