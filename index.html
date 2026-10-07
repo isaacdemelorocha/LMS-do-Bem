@@ -618,10 +618,11 @@
     const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Cursos`;
 
     /* 
-      Cole abaixo a URL gerada ao publicar sua Implantação Web (App da Web) 
-      do Google Apps Script que contém o doPost(e):
+      ========================================================================
+      👇 COLE A URL DO SEU GOOGLE APPS SCRIPT AQUI DENTRO DAS ASPAS 👇
+      ========================================================================
     */
-    const URL_WEBHOOK_TELEMETRIA = 'https://script.google.com/macros/s/AKfycbyc3G9fN_exemplo_substitua_aqui/exec';
+    const URL_WEBHOOK_TELEMETRIA = 'COLE_A_URL_DO_WEBHOOK_AQUI';
 
     /* --- CAPTURA DE PARÂMETROS UTM E REFERRER NO CLIENTE --- */
     const params = new URLSearchParams(window.location.search);
@@ -637,14 +638,14 @@
 
     /* --- SISTEMA DE CORES DINÂMICO PARA CADA PILAR --- */
     const PALETA_APPLE = [
-      { text: '#0071e3', bg: '#e8f2fc', iconBg: 'rgba(0, 113, 227, 0.12)' }, // Apple Blue
-      { text: '#bf4800', bg: '#faeee6', iconBg: 'rgba(191, 72, 0, 0.12)' },   // Amber / Orange
-      { text: '#1b7a42', bg: '#e8f5ed', iconBg: 'rgba(27, 122, 66, 0.12)' },  // Forest Green
-      { text: '#8935c1', bg: '#f4e9fc', iconBg: 'rgba(137, 53, 193, 0.12)' }, // Purple
-      { text: '#c72449', bg: '#fdecf0', iconBg: 'rgba(199, 36, 73, 0.12)' },  // Rose
-      { text: '#027a8e', bg: '#e5f6f8', iconBg: 'rgba(2, 122, 142, 0.12)' },  // Teal
-      { text: '#b36b00', bg: '#fef7e6', iconBg: 'rgba(179, 107, 0, 0.12)' },  // Gold / Ochre
-      { text: '#435368', bg: '#edf1f5', iconBg: 'rgba(67, 83, 104, 0.12)' }   // Slate
+      { text: '#0071e3', bg: '#e8f2fc', iconBg: 'rgba(0, 113, 227, 0.12)' },
+      { text: '#bf4800', bg: '#faeee6', iconBg: 'rgba(191, 72, 0, 0.12)' }, 
+      { text: '#1b7a42', bg: '#e8f5ed', iconBg: 'rgba(27, 122, 66, 0.12)' }, 
+      { text: '#8935c1', bg: '#f4e9fc', iconBg: 'rgba(137, 53, 193, 0.12)' },
+      { text: '#c72449', bg: '#fdecf0', iconBg: 'rgba(199, 36, 73, 0.12)' }, 
+      { text: '#027a8e', bg: '#e5f6f8', iconBg: 'rgba(2, 122, 142, 0.12)' }, 
+      { text: '#b36b00', bg: '#fef7e6', iconBg: 'rgba(179, 107, 0, 0.12)' }, 
+      { text: '#435368', bg: '#edf1f5', iconBg: 'rgba(67, 83, 104, 0.12)' }  
     ];
 
     const mapaCoresPilares = {};
@@ -974,7 +975,7 @@
       console.log('Telemetria capturada:', metadados);
 
       // Envia os metadados diretamente para a aba LogsAcesso via Webhook
-      if (URL_WEBHOOK_TELEMETRIA && !URL_WEBHOOK_TELEMETRIA.includes('exemplo_substitua_aqui')) {
+      if (URL_WEBHOOK_TELEMETRIA && URL_WEBHOOK_TELEMETRIA !== 'https://script.google.com/macros/s/AKfycbzJxScoxjxRR93SkQeb7E6I2wdQ0qrycuCLsqFm8AxIwaTL8Q-RkU4BsiTsqNRvrxk8FA/exec') {
         try {
           fetch(URL_WEBHOOK_TELEMETRIA, {
             method: 'POST',
