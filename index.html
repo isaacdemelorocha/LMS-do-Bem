@@ -657,29 +657,39 @@
       }, 2000); // Salva a palavra se o usuário parar de digitar por 2 segundos
     }
 
-    /* =======================================================
+/* =======================================================
        2. ENVIO DE TELEMETRIA AO SAIR DA PÁGINA (PAGEHIDE)
        ======================================================= */
-    window.addEventListener('pagehide', enviarTelemetriaNavegacao);
+    
+    // Mudamos para beforeunload e unload para maximizar a captura na saída
+    window.addEventListener('beforeunload', enviarTelemetriaNavegacao);
 
     function enviarTelemetriaNavegacao() {
-      // ⚠️ SUBSTITUA PELOS DADOS DO SEU NOVO GOOGLE FORMS DE NAVEGAÇÃO ⚠️
       const URL_FORM_NAVEGACAO = 'https://docs.google.com/forms/d/e/1FAIpQLSe7ojXwBZxc_P97mKpKUtFmuxGXPWhoPgJ09RQX31sblHMq0g/formResponse';
       
-      if (URL_FORM_NAVEGACAO.includes('1FAIpQLSe7ojXwBZxc_P97mKpKUtFmuxGXPWhoPgJ09RQX31sblHMq0g')) return; // Evita erro se não for preenchido
-
       const dadosNavegacao = new URLSearchParams();
       
-      // Mapeie os entrys do novo formulário (estes IDs são exemplos)
-      dadosNavegacao.append('entry.542734769', obterOuCriarAnonId()); // ID Usuário
-      dadosNavegacao.append('entry.586608640', Math.round((Date.now() - tempoInicio) / 1000)); // Tempo (s)
-      dadosNavegacao.append('entry.1837004314', maxScrollPercentual + '%'); // Scroll Máximo
-      dadosNavegacao.append('entry.868989117', termosPesquisados.join(' | ') || 'Nenhuma busca'); // Termos
-      dadosNavegacao.append('entry.1264240892', mapaCliques.join('; ') || 'Sem cliques'); // Mapa de Calor
-      dadosNavegacao.append('entry.1403675174', detectarAmbiente()); // Dispositivo
+      dadosNavegacao.append('entry.542734769', obterOuCriarAnonId()); 
+      dadosNavegacao.append('entry.586608640', Math.round((Date.now() - tempoInicio) / 1000)); 
+      dadosNavegacao.append('entry.1837004314', maxScrollPercentual + '%'); 
+      dadosNavegacao.append('entry.868989117', termosPesquisados.join(' | ') || 'Nenhuma busca'); 
+      dadosNavegacao.append('entry.1264240892', mapaCliques.join('; ') || 'Sem cliques'); 
+      dadosNavegacao.append('entry.1403675174', detectarAmbiente()); 
 
-      // sendBeacon é nativo do navegador para disparar pacotes sem atrasar o fechamento da aba
-      navigator.sendBeacon(URL_FORM_NAVEGACAO, dadosNavegacao);
+      console.log('A enviar telemetria de navegação via fetch...');
+
+      // Correção: Usando fetch com no-cors e keepalive no lugar de sendBeacon
+      fetch(URL_FORM_NAVEGACAO, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: dadosNavegacao,
+        keepalive: true // Garante que a requisição termina mesmo se a aba for fechada
+      }).catch(erroEnvio => {
+        console.warn('Erro ao disparar telemetria de navegação:', erroEnvio);
+      });
     }
 
 
